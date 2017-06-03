@@ -1,0 +1,5 @@
+.visualizer-vertical-space-fill {
+    height: -webkit-calc(100vh - 175px);
+    height: -moz-calc(100vh - 175px);
+    height: calc(100vh - 175px);
+}

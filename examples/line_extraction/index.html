@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head></head>
+
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-7">
+                <div id="div_Visualizer_Container" class="visualizer-vertical-space-fill"></div>
+            </div>
+            <div class="col-lg-5">
+                <div id="div_Cartesian_Plot_Container"></div>
+                <div id="div_Polar_Plot_Container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================== Shaders for the Visualizer to use ====================== -->
+    <!-- Vertex Shader -->
+    <script id="vertexshader" type="x-shader/x-vertex">
+        // VERTEX SHADER
+        uniform float sizeAtNominalDistance;  // in pixels
+        uniform float nominalDistance;        // in world units
+        uniform float minSize;                // in pixels
+        
+        attribute float alpha;
+        varying float vAlpha;
+        
+        void main() {
+            vAlpha = alpha;
+            vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+            float calculatedSize = sizeAtNominalDistance * ( nominalDistance / -mvPosition.z );
+            
+            if(calculatedSize > minSize)
+                gl_PointSize = calculatedSize;
+            else
+                gl_PointSize = minSize;
+            
+            gl_Position = projectionMatrix * mvPosition;
+        }
+    </script> <!-- End of Vertex Shader -->
+
+    <!-- Fragment Shader -->
+    <script id="fragmentshader" type="x-shader/x-fragment">
+        // FRAGMENT SHADER
+        uniform vec3 color;
+        uniform sampler2D texture;
+        varying float vAlpha;
+        
+        void main() {
+            gl_FragColor = vec4( color, 1.0 );
+            gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+            if ( gl_FragColor.a < ALPHATEST  || abs(gl_FragColor.a) < 0.00001 ) { 
+                discard; 
+            } 
+            else { 
+                gl_FragColor.a = vAlpha; 
+            }
+        }
+    </script> <!-- End of Fragment Shader --> 
+
+    <!-- ---------------------- Scripts + Stylesheets ---------------------- -->
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+    <!-- Bootstrap - compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <!-- Bootstrap - compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    <!-- Custom Stylesheet/CSS helpers-->
+    <link href="./style/style-helper-utils.css" rel="stylesheet">
+
+    <!-- Plotly -->
+    <script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- THREE.js -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/85/three.min.js"></script>
+
+    <!-- Source Code -->
+    <script src="./js/namespace.js"></script>
+    <script src="./js/components/EventDispatcher.js"></script>
+    <script src="./js/components/Utils.js"></script>
+    <script src="./js/components/Data.js"></script>
+    <script src="./js/components/Processing.js"></script>
+    <script src="./js/components/Perception.js"></script>
+    <script src="./js/components/Plotting.js"></script>
+    <script src="./js/components/Graphics.js"></script>
+
+    <!-- Include Example Data Files -->
+    <script src="./data/example_1.js"></script>
+
+    <!-- Main Application Logic -->
+    <script src="./js/main.js"></script>
+</body>
+
+</html>
